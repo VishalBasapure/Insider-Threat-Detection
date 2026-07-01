@@ -37,19 +37,20 @@ html, body, [class*="css"] {
 }
 /* Header */
 .shield-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #111827 50%, #0a1628 100%);
-    border: 1px solid #1e3a5f;
+    background: linear-gradient(135deg, #ffffff 0%, #eff6ff 52%, #e0f2fe 100%);
+    border: 1px solid #bfdbfe;
     border-radius: 12px;
     padding: 24px 32px;
     margin-bottom: 24px;
     display: flex;
     align-items: center;
     gap: 16px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
 }
-.shield-title { font-size: 28px; font-weight: 700; color: #e2e8f0; letter-spacing: -0.5px; }
-.shield-sub { font-size: 13px; color: #64748b; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+.shield-title { font-size: 28px; font-weight: 700; color: #0f172a; letter-spacing: -0.5px; }
+.shield-sub { font-size: 13px; color: #475569; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
 .live-badge {
-    background: #052e16; border: 1px solid #16a34a; color: #4ade80;
+    background: #ecfdf5; border: 1px solid #34d399; color: #047857;
     padding: 4px 12px; border-radius: 20px; font-size: 11px;
     font-family: 'JetBrains Mono', monospace; font-weight: 500;
     animation: pulse 2s infinite;
@@ -58,16 +59,17 @@ html, body, [class*="css"] {
 
 /* KPI cards */
 .kpi-card {
-    background: #f8fafc; border: 1px solid #1e3a5f;
+    background: #ffffff; border: 1px solid #bfdbfe;
     border-radius: 10px; padding: 20px 24px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 .kpi-label { font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; }
 .kpi-value { font-size: 36px; font-weight: 700; line-height: 1.1; margin: 4px 0; }
 .kpi-delta { font-size: 12px; color: #475569; font-family: 'JetBrains Mono', monospace; }
-.kpi-critical { color: #f87171; }
-.kpi-high { color: #fb923c; }
-.kpi-blue { color: #60a5fa; }
-.kpi-green { color: #4ade80; }
+.kpi-critical { color: #dc2626; }
+.kpi-high { color: #ea580c; }
+.kpi-blue { color: #2563eb; }
+.kpi-green { color: #16a34a; }
 
 /* Section headers */
 .section-head {
@@ -79,62 +81,63 @@ html, body, [class*="css"] {
 }
 
 /* Alert table rows */
-.alert-critical { color: #f87171 !important; font-weight: 600; }
-.alert-high { color: #fb923c !important; font-weight: 600; }
-.alert-medium { color: #fbbf24 !important; }
-.alert-low { color: #4ade80 !important; }
+.alert-critical { color: #dc2626 !important; font-weight: 600; }
+.alert-high { color: #ea580c !important; font-weight: 600; }
+.alert-medium { color: #ca8a04 !important; }
+.alert-low { color: #16a34a !important; }
 
 /* Tab styling */
 .stTabs [data-baseweb="tab-list"] {
     background: #f8fafc; border-radius: 8px; padding: 4px; gap: 4px;
-    border: 1px solid #1e3a5f;
+    border: 1px solid #bfdbfe;
 }
 .stTabs [data-baseweb="tab"] {
-    color: #64748b; background: transparent; border-radius: 6px;
+    color: #475569; background: transparent; border-radius: 6px;
     font-family: 'Space Grotesk', sans-serif; font-weight: 500;
 }
 .stTabs [aria-selected="true"] {
-    background: #1e3a5f !important; color: #e2e8f0 !important;
+    background: #2563eb !important; color: #ffffff !important;
 }
 
 /* Expander */
 .streamlit-expanderHeader {
-    background: #f8fafc !important; border: 1px solid #1e3a5f !important;
+    background: #ffffff !important; border: 1px solid #bfdbfe !important;
     border-radius: 8px !important; color: #111827 !important;
 }
 
 /* Buttons */
 .stButton > button {
-    background: #1e3a5f; border: 1px solid #3b82f6; color: #93c5fd;
+    background: #2563eb; border: 1px solid #2563eb; color: #ffffff;
     border-radius: 6px; font-family: 'Space Grotesk', sans-serif;
     font-weight: 500; transition: all 0.2s;
 }
-.stButton > button:hover { background: #2563eb; color: white; border-color: #60a5fa; }
+.stButton > button:hover { background: #1d4ed8; color: white; border-color: #1d4ed8; }
 
 /* Metrics */
 [data-testid="stMetric"] {
-    background: #f8fafc; border: 1px solid #1e3a5f;
+    background: #ffffff; border: 1px solid #bfdbfe;
     border-radius: 10px; padding: 16px 20px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 [data-testid="stMetricLabel"] { color: #64748b !important; font-size: 12px !important; }
-[data-testid="stMetricValue"] { color: #e2e8f0 !important; }
+[data-testid="stMetricValue"] { color: #0f172a !important; }
 
 /* Plotly charts dark background */
 .js-plotly-plot { border-radius: 8px; overflow: hidden; }
 
 /* Pipeline feed */
 .pipeline-event {
-    background: #0a1628; border-left: 3px solid #1e3a5f;
+    background: #f8fafc; border-left: 3px solid #2563eb;
     padding: 6px 12px; margin: 2px 0; border-radius: 0 4px 4px 0;
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #64748b;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #334155;
 }
-.pipeline-critical { border-left-color: #f87171 !important; color: #fca5a5 !important; }
-.pipeline-high { border-left-color: #fb923c !important; color: #fdba74 !important; }
+.pipeline-critical { border-left-color: #dc2626 !important; color: #b91c1c !important; }
+.pipeline-high { border-left-color: #ea580c !important; color: #c2410c !important; }
 
 /* Narrative block */
 .llm-narrative {
-    background: linear-gradient(135deg, #0d1a2e, #0a1628);
-    border: 1px solid #1e3a5f; border-left: 4px solid #3b82f6;
+    background: #ffffff;
+    border: 1px solid #bfdbfe; border-left: 4px solid #2563eb;
     border-radius: 8px; padding: 20px; margin: 12px 0;
     font-size: 14px; line-height: 1.7; color: #111827;
 }
@@ -241,22 +244,22 @@ with tab1:
     alert_df = working_df[working_df['severity'].isin(['CRITICAL','HIGH'])].sort_values('risk_score', ascending=False).head(10)
 
     def color_severity(val):
-        colors = {'CRITICAL': 'color: #f87171; font-weight:700',
-                  'HIGH': 'color: #fb923c; font-weight:600',
-                  'MEDIUM': 'color: #fbbf24', 'LOW': 'color: #4ade80'}
+        colors = {'CRITICAL': 'color: #dc2626; font-weight:700',
+                  'HIGH': 'color: #ea580c; font-weight:600',
+                  'MEDIUM': 'color: #ca8a04', 'LOW': 'color: #16a34a'}
         return colors.get(val, '')
 
     def color_score(val):
-        if val >= 85: return 'color: #f87171; font-weight:700'
-        if val >= 65: return 'color: #fb923c'
-        if val >= 40: return 'color: #fbbf24'
-        return 'color: #4ade80'
+        if val >= 85: return 'color: #dc2626; font-weight:700'
+        if val >= 65: return 'color: #ea580c'
+        if val >= 40: return 'color: #ca8a04'
+        return 'color: #16a34a'
 
     display_cols = ['timestamp','username','user_dept','action','resource','risk_score','severity']
     styled = alert_df[display_cols].style\
         .map(color_severity, subset=['severity'])\
         .map(color_score, subset=['risk_score'])\
-        .set_properties(**{'background-color': '#f8fafc', 'color': '#111827', 'border-color': '#1e3a5f'})\
+        .set_properties(**{'background-color': '#ffffff', 'color': '#111827', 'border-color': '#e2e8f0'})\
         .format({'risk_score': '{:.0f}', 'timestamp': lambda x: str(x)[:16]})
     st.dataframe(styled, use_container_width=True, height=320)
 
@@ -275,8 +278,8 @@ with tab1:
         hist_df = working_df.copy()
         hist_df['band'] = hist_df['risk_score'].apply(score_band)
         band_order = ['Low (<40)', 'Medium (40-64)', 'High (65-84)', 'Critical (85+)']
-        color_map = {'Low (<40)': '#4ade80', 'Medium (40-64)': '#fbbf24',
-                     'High (65-84)': '#fb923c', 'Critical (85+)': '#f87171'}
+        color_map = {'Low (<40)': '#16a34a', 'Medium (40-64)': '#ca8a04',
+                     'High (65-84)': '#ea580c', 'Critical (85+)': '#dc2626'}
         fig_hist = px.histogram(hist_df, x='risk_score', color='band',
                                  color_discrete_map=color_map,
                                  category_orders={'band': band_order},
@@ -284,7 +287,7 @@ with tab1:
         fig_hist.update_layout(
             plot_bgcolor='#f8fafc', paper_bgcolor='#f8fafc',
             font_color='#374151', legend_title_text='Band',
-            xaxis=dict(gridcolor='#1e3a5f'), yaxis=dict(gridcolor='#1e3a5f'),
+            xaxis=dict(gridcolor='#e2e8f0'), yaxis=dict(gridcolor='#e2e8f0'),
             margin=dict(l=0, r=0, t=10, b=0), height=300
         )
         st.plotly_chart(fig_hist, use_container_width=True)
@@ -294,12 +297,12 @@ with tab1:
         top_users = working_df.groupby('username')['risk_score'].sum().nlargest(10).reset_index()
         fig_bar = px.bar(top_users, x='risk_score', y='username',
                           orientation='h', color='risk_score',
-                          color_continuous_scale=['#1e3a5f', '#3b82f6', '#f87171'])
+                          color_continuous_scale=['#dbeafe', '#2563eb', '#dc2626'])
         fig_bar.update_layout(
             plot_bgcolor='#f8fafc', paper_bgcolor='#f8fafc',
             font_color='#374151', showlegend=False,
-            xaxis=dict(gridcolor='#1e3a5f', title='Cumulative Risk Score'),
-            yaxis=dict(gridcolor='#1e3a5f', title='', autorange='reversed'),
+            xaxis=dict(gridcolor='#e2e8f0', title='Cumulative Risk Score'),
+            yaxis=dict(gridcolor='#e2e8f0', title='', autorange='reversed'),
             margin=dict(l=0, r=0, t=10, b=0), height=300
         )
         st.plotly_chart(fig_bar, use_container_width=True)
@@ -319,7 +322,7 @@ with tab1:
         fig_heat = go.Figure(go.Heatmap(
             z=heat_pivot.values, x=list(heat_pivot.columns),
             y=list(heat_pivot.index),
-            colorscale=[[0,'#f8fafc'],[0.3,'#1e3a5f'],[0.7,'#fb923c'],[1,'#f87171']],
+            colorscale=[[0,'#f8fafc'],[0.3,'#bfdbfe'],[0.7,'#ea580c'],[1,'#dc2626']],
             showscale=True
         ))
         fig_heat.update_layout(
@@ -339,7 +342,7 @@ with tab1:
         fig_pie = go.Figure(go.Pie(
             labels=pie_data.index, values=pie_data.values,
             hole=0.55,
-            marker_colors=['#f87171','#fb923c','#fbbf24','#4ade80','#64748b'],
+            marker_colors=['#dc2626','#ea580c','#ca8a04','#16a34a','#64748b'],
             textfont_color='#111827'
         ))
         fig_pie.update_layout(
@@ -359,15 +362,15 @@ with tab1:
         mode='lines+markers', fill='tozeroy',
         line=dict(color='#3b82f6', width=2),
         fillcolor='rgba(59,130,246,0.1)',
-        marker=dict(color='#60a5fa', size=6)
+        marker=dict(color='#2563eb', size=6)
     ))
-    fig_thresh.add_vline(x=40, line_dash='dash', line_color='#fbbf24', annotation_text='MEDIUM', annotation_font_color='#fbbf24')
-    fig_thresh.add_vline(x=65, line_dash='dash', line_color='#fb923c', annotation_text='HIGH', annotation_font_color='#fb923c')
-    fig_thresh.add_vline(x=85, line_dash='dash', line_color='#f87171', annotation_text='CRITICAL', annotation_font_color='#f87171')
+    fig_thresh.add_vline(x=40, line_dash='dash', line_color='#ca8a04', annotation_text='MEDIUM', annotation_font_color='#ca8a04')
+    fig_thresh.add_vline(x=65, line_dash='dash', line_color='#ea580c', annotation_text='HIGH', annotation_font_color='#ea580c')
+    fig_thresh.add_vline(x=85, line_dash='dash', line_color='#dc2626', annotation_text='CRITICAL', annotation_font_color='#dc2626')
     fig_thresh.update_layout(
         plot_bgcolor='#f8fafc', paper_bgcolor='#f8fafc', font_color='#374151',
-        xaxis=dict(gridcolor='#1e3a5f', title='Score Threshold'),
-        yaxis=dict(gridcolor='#1e3a5f', title='Alert Count'),
+        xaxis=dict(gridcolor='#e2e8f0', title='Score Threshold'),
+        yaxis=dict(gridcolor='#e2e8f0', title='Alert Count'),
         margin=dict(l=0, r=0, t=10, b=0), height=250
     )
     st.plotly_chart(fig_thresh, use_container_width=True)
@@ -405,10 +408,10 @@ with tab2:
 
         with c1:
             # User dossier card
-            sev_color = {'CRITICAL':'#f87171','HIGH':'#fb923c','MEDIUM':'#fbbf24','LOW':'#4ade80'}.get(row['severity'],'#374151')
+            sev_color = {'CRITICAL':'#dc2626','HIGH':'#ea580c','MEDIUM':'#ca8a04','LOW':'#16a34a'}.get(row['severity'],'#374151')
             st.markdown(f"""
-            <div style="background:#f8fafc;border:1px solid #1e3a5f;border-radius:10px;padding:20px">
-                <div style="font-size:18px;font-weight:700;color:#e2e8f0">{row['username']}</div>
+            <div style="background:#ffffff;border:1px solid #bfdbfe;border-radius:10px;padding:20px;box-shadow:0 8px 24px rgba(15,23,42,0.06)">
+                <div style="font-size:18px;font-weight:700;color:#0f172a">{row['username']}</div>
                 <div style="font-size:12px;color:#64748b;font-family:'JetBrains Mono',monospace;margin:4px 0 12px">{row.get('user_role','')}</div>
                 <div style="display:grid;gap:6px;font-size:13px">
                     <div>🏢 <b>Dept:</b> {row.get('user_dept','')}</div>
@@ -417,7 +420,7 @@ with tab2:
                     <div>💤 <b>Inactive days:</b> {row.get('days_inactive',0)}</div>
                     <div>✅ <b>Active:</b> {user_profile.get('is_active','')}</div>
                 </div>
-                <div style="margin-top:16px;padding:10px;background:#0a1628;border-radius:8px">
+                <div style="margin-top:16px;padding:10px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
                     <div style="font-size:11px;color:#64748b;font-family:'JetBrains Mono',monospace">RISK SCORE</div>
                     <div style="font-size:32px;font-weight:700;color:{sev_color}">{row['risk_score']}/100</div>
                     <div style="font-size:14px;font-weight:600;color:{sev_color}">{row['severity']}</div>
@@ -439,9 +442,9 @@ with tab2:
                     bar_pct = min(100, weight * 3)
                     st.markdown(f"""
                     <div style="margin:6px 0">
-                        <div style="font-size:13px;color:#111827;margin-bottom:3px">⚡ {r.strip()} <span style="color:#fb923c;font-family:'JetBrains Mono',monospace">+{weight}</span></div>
-                        <div style="background:#1e3a5f;border-radius:4px;height:6px">
-                            <div style="background:#fb923c;width:{bar_pct}%;height:6px;border-radius:4px"></div>
+                        <div style="font-size:13px;color:#111827;margin-bottom:3px">⚡ {r.strip()} <span style="color:#ea580c;font-family:'JetBrains Mono',monospace">+{weight}</span></div>
+                        <div style="background:#e2e8f0;border-radius:4px;height:6px">
+                            <div style="background:#ea580c;width:{bar_pct}%;height:6px;border-radius:4px"></div>
                         </div>
                     </div>""", unsafe_allow_html=True)
 
@@ -455,12 +458,12 @@ with tab2:
         if len(user_history) > 0:
             fig_timeline = px.scatter(user_history, x='timestamp', y='action',
                                        color='risk_score', size='risk_score',
-                                       color_continuous_scale=['#4ade80','#fbbf24','#fb923c','#f87171'],
+                                       color_continuous_scale=['#16a34a','#ca8a04','#ea580c','#dc2626'],
                                        hover_data=['resource','severity','time_classification'],
                                        size_max=15)
             fig_timeline.update_layout(
                 plot_bgcolor='#f8fafc', paper_bgcolor='#f8fafc', font_color='#374151',
-                xaxis=dict(gridcolor='#1e3a5f'), yaxis=dict(gridcolor='#1e3a5f'),
+                xaxis=dict(gridcolor='#e2e8f0'), yaxis=dict(gridcolor='#e2e8f0'),
                 margin=dict(l=0,r=0,t=10,b=0), height=250
             )
             st.plotly_chart(fig_timeline, use_container_width=True)
@@ -556,7 +559,7 @@ Write in a professional security analyst tone. Be specific and decisive."""
             for part in sections:
                 if part.startswith("**") and part.endswith("**"):
                     label = part[2:-2]
-                    rendered += f'<div style="font-size:12px;font-weight:700;color:#60a5fa;font-family:JetBrains Mono,monospace;margin:14px 0 4px;text-transform:uppercase;letter-spacing:1px">⚡ {label}</div>'
+                    rendered += f'<div style="font-size:12px;font-weight:700;color:#2563eb;font-family:JetBrains Mono,monospace;margin:14px 0 4px;text-transform:uppercase;letter-spacing:1px">⚡ {label}</div>'
                 else:
                     # Convert numbered list items to styled rows
                     lines = part.strip().split('\n')
@@ -661,7 +664,7 @@ with tab3:
             return [min(100, max(0, base + trend * i + np.random.normal(0, 2))) for i in range(7)]
 
         fig_traj = go.Figure()
-        colors = ['#f87171','#fb923c','#fbbf24','#4ade80','#60a5fa','#a78bfa',
+        colors = ['#dc2626','#ea580c','#ca8a04','#16a34a','#2563eb','#7c3aed',
                   '#34d399','#f472b6','#38bdf8','#c084fc','#fb7185','#86efac']
         days = [f"Day +{i}" for i in range(7)]
 
@@ -673,13 +676,13 @@ with tab3:
                 marker=dict(size=5)
             ))
 
-        fig_traj.add_hline(y=65, line_dash='dash', line_color='#fb923c',
-                            annotation_text='HIGH threshold', annotation_font_color='#fb923c')
-        fig_traj.add_hline(y=85, line_dash='dash', line_color='#f87171',
-                            annotation_text='CRITICAL threshold', annotation_font_color='#f87171')
+        fig_traj.add_hline(y=65, line_dash='dash', line_color='#ea580c',
+                            annotation_text='HIGH threshold', annotation_font_color='#ea580c')
+        fig_traj.add_hline(y=85, line_dash='dash', line_color='#dc2626',
+                            annotation_text='CRITICAL threshold', annotation_font_color='#dc2626')
         fig_traj.update_layout(
             plot_bgcolor='#f8fafc', paper_bgcolor='#f8fafc', font_color='#374151',
-            xaxis=dict(gridcolor='#1e3a5f'), yaxis=dict(gridcolor='#1e3a5f', title='Predicted Risk Score'),
+            xaxis=dict(gridcolor='#e2e8f0'), yaxis=dict(gridcolor='#e2e8f0', title='Predicted Risk Score'),
             margin=dict(l=0,r=0,t=10,b=0), height=350,
             legend=dict(font_color='#374151', bgcolor='#f8fafc')
         )
@@ -709,7 +712,7 @@ with tab3:
 
     cluster_df = cluster_users(working_df)
     cluster_names = {0: 'Standard Access', 1: 'High-Risk Behavior', 2: 'Off-Hours / Elevated'}
-    cluster_colors = {0: '#4ade80', 1: '#f87171', 2: '#fb923c'}
+    cluster_colors = {0: '#16a34a', 1: '#dc2626', 2: '#ea580c'}
     cluster_df['cluster_name'] = cluster_df['cluster'].map(cluster_names)
     cluster_df['color'] = cluster_df['cluster'].map(cluster_colors)
 
@@ -723,7 +726,7 @@ with tab3:
     )
     fig_cluster.update_layout(
         plot_bgcolor='#f8fafc', paper_bgcolor='#f8fafc', font_color='#374151',
-        xaxis=dict(gridcolor='#1e3a5f'), yaxis=dict(gridcolor='#1e3a5f'),
+        xaxis=dict(gridcolor='#e2e8f0'), yaxis=dict(gridcolor='#e2e8f0'),
         margin=dict(l=0,r=0,t=10,b=0), height=320,
         legend=dict(font_color='#374151', bgcolor='#f8fafc')
     )
@@ -750,9 +753,9 @@ with tab3:
     ]
     for title, rec in recs:
         st.markdown(f"""
-        <div style="background:#f8fafc;border:1px solid #1e3a5f;border-left:4px solid #3b82f6;
+        <div style="background:#ffffff;border:1px solid #bfdbfe;border-left:4px solid #2563eb;
                     border-radius:8px;padding:14px 18px;margin:8px 0">
-            <div style="font-size:12px;font-weight:600;color:#60a5fa;font-family:'JetBrains Mono',monospace;
+            <div style="font-size:12px;font-weight:600;color:#2563eb;font-family:'JetBrains Mono',monospace;
                         margin-bottom:4px">⚡ {title}</div>
             <div style="font-size:13px;color:#111827">{rec}</div>
         </div>""", unsafe_allow_html=True)
@@ -765,12 +768,12 @@ with tab4:
     st.markdown('<div class="section-head">⚡ Kafka → Spark Simulation — Live Event Stream</div>', unsafe_allow_html=True)
 
     st.markdown("""
-    <div style="background:#f8fafc;border:1px solid #1e3a5f;border-radius:8px;padding:16px;margin-bottom:16px">
+    <div style="background:#ffffff;border:1px solid #bfdbfe;border-radius:8px;padding:16px;margin-bottom:16px">
         <div style="font-size:13px;color:#374151;line-height:1.8">
-            This tab simulates the production architecture: <span style="color:#60a5fa">Kafka producer</span> 
-            streams events one-by-one → <span style="color:#60a5fa">Spark processor</span> scores each event 
-            → <span style="color:#60a5fa">Dashboard</span> updates in real-time. In production, this handles 
-            <b style="color:#e2e8f0">1M+ events/day across 20 Spark worker nodes</b>.
+            This tab simulates the production architecture: <span style="color:#2563eb">Kafka producer</span> 
+            streams events one-by-one → <span style="color:#2563eb">Spark processor</span> scores each event 
+            → <span style="color:#2563eb">Dashboard</span> updates in real-time. In production, this handles 
+            <b style="color:#0f172a">1M+ events/day across 20 Spark worker nodes</b>.
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -938,7 +941,7 @@ One sentence explaining why this is {severity} specifically (which combination o
         if critical_alerts_detail:
             st.markdown('<div class="section-head">🤖 AI Triage Report — Critical Alerts Deep Analysis</div>', unsafe_allow_html=True)
             st.markdown("""
-            <div style="background:#f8fafc;border:1px solid #1e3a5f;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#374151">
+            <div style="background:#ffffff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#374151">
                 Each CRITICAL alert below has been analyzed by Claude AI. Expand any alert to see the full threat assessment, why the severity was assigned, and the 3-step immediate containment plan.
             </div>""", unsafe_allow_html=True)
 
@@ -975,7 +978,7 @@ One sentence explaining why this is {severity} specifically (which combination o
                         </div>""", unsafe_allow_html=True)
 
                         # Signal breakdown bars
-                        st.markdown('<div style="font-size:12px;font-weight:600;color:#60a5fa;margin-bottom:6px;font-family:JetBrains Mono,monospace">SIGNALS TRIGGERED</div>', unsafe_allow_html=True)
+                        st.markdown('<div style="font-size:12px;font-weight:600;color:#2563eb;margin-bottom:6px;font-family:JetBrains Mono,monospace">SIGNALS TRIGGERED</div>', unsafe_allow_html=True)
                         signal_weights = {
                             'off-hours': 20, 'sensitive': 25, 'high-risk action': 20,
                             'unapproved': 20, 'privilege mismatch': 30, 'failed': 15, 'inactive': 20
@@ -985,16 +988,16 @@ One sentence explaining why this is {severity} specifically (which combination o
                             bar_pct = min(100, weight * 3.5)
                             st.markdown(f"""
                             <div style="margin:4px 0">
-                                <div style="font-size:12px;color:#374151;margin-bottom:2px">⚡ {reason} <span style="color:#fb923c;font-family:'JetBrains Mono',monospace">+{weight}pts</span></div>
-                                <div style="background:#1e3a5f;border-radius:3px;height:5px">
-                                    <div style="background:linear-gradient(90deg,#fb923c,#f87171);width:{bar_pct}%;height:5px;border-radius:3px"></div>
+                                <div style="font-size:12px;color:#374151;margin-bottom:2px">⚡ {reason} <span style="color:#ea580c;font-family:'JetBrains Mono',monospace">+{weight}pts</span></div>
+                                <div style="background:#e2e8f0;border-radius:3px;height:5px">
+                                    <div style="background:linear-gradient(90deg,#ea580c,#dc2626);width:{bar_pct}%;height:5px;border-radius:3px"></div>
                                 </div>
                             </div>""", unsafe_allow_html=True)
 
                     with col_score:
-                        sev_color = '#f87171' if sev == 'CRITICAL' else '#fb923c'
+                        sev_color = '#dc2626' if sev == 'CRITICAL' else '#ea580c'
                         st.markdown(f"""
-                        <div style="background:#0a1628;border:1px solid {sev_color};border-radius:10px;padding:20px;text-align:center">
+                        <div style="background:#ffffff;border:1px solid {sev_color};border-radius:10px;padding:20px;text-align:center;box-shadow:0 8px 24px rgba(15,23,42,0.06)">
                             <div style="font-size:11px;color:#64748b;font-family:'JetBrains Mono',monospace;margin-bottom:4px">RISK SCORE</div>
                             <div style="font-size:42px;font-weight:700;color:{sev_color};line-height:1">{sc}</div>
                             <div style="font-size:11px;color:#64748b;margin:2px 0">/100</div>
@@ -1002,7 +1005,7 @@ One sentence explaining why this is {severity} specifically (which combination o
                         </div>""", unsafe_allow_html=True)
 
                     # AI analysis section
-                    st.markdown('<div style="font-size:12px;font-weight:600;color:#60a5fa;margin:12px 0 8px;font-family:JetBrains Mono,monospace;border-left:3px solid #3b82f6;padding-left:8px">🤖 CLAUDE AI TRIAGE REPORT</div>', unsafe_allow_html=True)
+                    st.markdown('<div style="font-size:12px;font-weight:600;color:#2563eb;margin:12px 0 8px;font-family:JetBrains Mono,monospace;border-left:3px solid #2563eb;padding-left:8px">🤖 CLAUDE AI TRIAGE REPORT</div>', unsafe_allow_html=True)
 
                     if api_key:
                         cache_key = f"pipe_narrative_{ev['user_id']}_{ev['timestamp']}"
@@ -1019,7 +1022,7 @@ One sentence explaining why this is {severity} specifically (which combination o
                             for part in sections:
                                 if part.startswith("**") and part.endswith("**"):
                                     label = part[2:-2]
-                                    rendered += f'<div style="font-size:11px;font-weight:700;color:#60a5fa;font-family:JetBrains Mono,monospace;margin:12px 0 4px;text-transform:uppercase;letter-spacing:1px">⚡ {label}</div>'
+                                    rendered += f'<div style="font-size:11px;font-weight:700;color:#2563eb;font-family:JetBrains Mono,monospace;margin:12px 0 4px;text-transform:uppercase;letter-spacing:1px">⚡ {label}</div>'
                                 else:
                                     for line in part.strip().split('\n'):
                                         line = line.strip()
@@ -1034,7 +1037,7 @@ One sentence explaining why this is {severity} specifically (which combination o
                             st.markdown(f'<div class="llm-narrative" style="margin-top:8px">{rendered}</div>', unsafe_allow_html=True)
                     else:
                         st.markdown("""
-                        <div style="background:#f8fafc;border:1px solid #fb923c;border-radius:8px;padding:14px;font-size:13px;color:#92400e">
+                        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:14px;font-size:13px;color:#92400e">
                             ⚠️ Set the <code>ANTHROPIC_API_KEY</code> environment variable to enable AI triage reports.<br>
                             Run: <code>export ANTHROPIC_API_KEY=your_key_here</code> then restart Streamlit.
                         </div>""", unsafe_allow_html=True)
@@ -1043,11 +1046,11 @@ One sentence explaining why this is {severity} specifically (which combination o
                     ba1, ba2 = st.columns(2)
                     with ba1:
                         st.markdown(f"""
-                        <div style="background:#052e16;border:1px solid #16a34a;border-radius:6px;padding:10px 14px;font-size:12px;color:#4ade80;font-family:'JetBrains Mono',monospace">
+                        <div style="background:#ecfdf5;border:1px solid #34d399;border-radius:6px;padding:10px 14px;font-size:12px;color:#047857;font-family:'JetBrains Mono',monospace">
                             ✅ CONTAINMENT: Disable {ev['username']} in Active Directory immediately
                         </div>""", unsafe_allow_html=True)
                     with ba2:
                         st.markdown(f"""
-                        <div style="background:#2d1515;border:1px solid #f87171;border-radius:6px;padding:10px 14px;font-size:12px;color:#fca5a5;font-family:'JetBrains Mono',monospace">
+                        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:10px 14px;font-size:12px;color:#b91c1c;font-family:'JetBrains Mono',monospace">
                             🔴 INVESTIGATE: Pull all access logs for {ev['username']} — last 72 hours
                         </div>""", unsafe_allow_html=True)
