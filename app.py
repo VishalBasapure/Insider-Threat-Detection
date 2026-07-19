@@ -3,16 +3,33 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
-import threading
-import queue
 import time
-import json
-import requests
-import os
-from datetime import datetime, timedelta
+from datetime import timedelta
+from google import genai
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder, StandardScaler
+from spark_processor import score_event
+
+GEMINI_MODEL = "gemini-3.5-flash"
+
+
+def generate_ai(prompt):
+    try:
+        api_key = st.secrets["GEMINI_API_KEY"]
+
+        client = genai.Client(api_key=api_key)
+
+        response = client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt
+        )
+
+        return response.text
+
+    except Exception as e:
+        return f"Analysis unavailable: {e}"
+
 
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -469,17 +486,15 @@ with tab2:
             st.plotly_chart(fig_timeline, use_container_width=True)
 
         # LLM Narrative
-        st.markdown('<div class="section-head">🤖 AI Threat Narrative (Claude)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-head">🤖 AI Threat Narrative</div>', unsafe_allow_html=True)
 
         llm_key = f"narrative_{selected_idx}"
         if llm_key not in st.session_state:
             st.session_state[llm_key] = None
 
         if st.button("🧠 Generate AI Analysis", key=f"gen_{selected_idx}"):
-            with st.spinner("Claude is analyzing the threat pattern..."):
-                try:
-                    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-                    prompt = f"""You are a senior cybersecurity analyst at a Fortune 500 company. A threat detection system has flagged the following insider threat alert. Provide a comprehensive investigation report.
+            with st.spinner("AI is analyzing the threat pattern..."):
+                prompt = f"""You are a senior cybersecurity analyst at a Fortune 500 company. A threat detection system has flagged the following insider threat alert. Provide a comprehensive investigation report.
 
 ═══════════════════════════════════════
 ALERT DETAILS
@@ -525,30 +540,7 @@ Suggest 3 policy or technical improvements to prevent this class of threat in fu
 
 Write in a professional security analyst tone. Be specific and decisive."""
 
-                    response = requests.post(
-                        "https://api.anthropic.com/v1/messages",
-                        headers={
-                            "Content-Type": "application/json",
-                            "x-api-key": api_key,
-                            "anthropic-version": "2023-06-01"
-                        },
-                        json={
-                            "model": "claude-sonnet-4-6",
-                            "max_tokens": 1500,
-                            "messages": [{"role": "user", "content": prompt}]
-                        },
-                        timeout=45
-                    )
-                    data = response.json()
-                    if 'content' in data and len(data['content']) > 0:
-                        narrative = data['content'][0]['text']
-                    elif 'error' in data:
-                        narrative = f"API Error: {data['error'].get('message', str(data['error']))}\n\nMake sure ANTHROPIC_API_KEY environment variable is set."
-                    else:
-                        narrative = f"Unexpected response: {str(data)}"
-                    st.session_state[llm_key] = narrative
-                except Exception as e:
-                    st.session_state[llm_key] = f"Analysis unavailable: {str(e)}\n\nCheck that ANTHROPIC_API_KEY is set as an environment variable."
+                st.session_state[llm_key] = generate_ai(prompt)
 
         if st.session_state[llm_key]:
             narrative_text = st.session_state[llm_key]
@@ -593,19 +585,28 @@ Write in a professional security analyst tone. Be specific and decisive."""
                 from fpdf import FPDF
                 pdf = FPDF()
                 pdf.add_page()
+                
+                # Title
                 pdf.set_font("Helvetica", "B", 16)
-                pdf.cell(0, 10, "InsiderShield — Threat Report", ln=True)
+                pdf.cell(0, 10, "InsiderShield - Threat Report", ln=1) # Using ln=1 ensures it goes to next line
                 pdf.set_font("Helvetica", "", 11)
                 pdf.ln(5)
+                
+                # CRITICAL FIX: Explicitly reset the X position back to the left margin
+                pdf.set_x(10)
+                
+                # Loop through and print the details
                 for label, val in [("User", row['username']), ("Department", row.get('user_dept','')),
                                     ("Severity", row['severity']), ("Risk Score", f"{row['risk_score']}/100"),
                                     ("Action", row['action']), ("Resource", row['resource']),
                                     ("Timestamp", str(row['timestamp'])), ("Signals", str(row.get('anomaly_reasons','')))]:
                     pdf.multi_cell(0, 8, f"{label}: {val}")
+                    pdf.set_x(10) # Keep resetting X for each line to prevent creeping margins
+                    
                 pdf_bytes = pdf.output()
                 st.download_button("⬇️ Download PDF", data=bytes(pdf_bytes),
-                                   file_name=f"threat_report_{row['username']}.pdf",
-                                   mime="application/pdf")
+                                file_name=f"threat_report_{row['username']}.pdf",
+                                mime="application/pdf")
     else:
         st.info("👆 Click a row above to open the investigation panel.")
 
@@ -805,37 +806,8 @@ with tab4:
         raw_logs = pd.read_csv('data_access_logs.csv', parse_dates=['timestamp'])
         raw_profiles = pd.read_csv('user_profiles.csv').set_index('user_id').to_dict('index')
 
-        def score_event_fast(event):
-            user_id = event['user_id']
-            profile = raw_profiles.get(user_id, {})
-            score = 0; reasons = []
-            if event['time_classification'] in ['night', 'unusual_hours']:
-                score += 20; reasons.append(f"Off-hours ({event['time_classification']})")
-            s = {'low':0,'medium':10,'high':25,'restricted':35}.get(event['resource_sensitivity'],0)
-            if s > 0: score += s; reasons.append(f"Sensitive data ({event['resource_sensitivity']})")
-            a = {'export_data':25,'admin_operation':20,'api_call':8,'sql_query':5,'login':2}.get(event['action'],5)
-            score += a
-            if a >= 20: reasons.append(f"High-risk action: {event['action']}")
-            approved = str(profile.get('systems_access','')).split('|')
-            if event['resource'] not in approved: score += 20; reasons.append("Unapproved resource")
-            privilege = profile.get('privilege_level','user')
-            if privilege == 'user' and event['action'] == 'admin_operation':
-                score += 30; reasons.append("Privilege mismatch: user doing admin ops")
-            if event['status'] == 'failure': score += 15; reasons.append("Access attempt FAILED")
-            inactive = profile.get('days_inactive', 0)
-            if inactive > 30: score += 20; reasons.append(f"Account inactive {inactive} days")
-            if privilege == 'admin' and event['resource'] in approved: score = max(0, score - 25)
-            score = min(score, 100)
-            severity = 'CRITICAL' if score >= 85 else 'HIGH' if score >= 65 else 'MEDIUM' if score >= 40 else 'LOW'
-            profile_dept = profile.get('department', '')
-            profile_role = profile.get('job_title', '')
-            return score, severity, reasons, privilege, profile_dept, profile_role, inactive
-
         def get_pipeline_ai_analysis(event, score, severity, reasons, privilege, dept, role, inactive_days):
-            """Call Anthropic API for per-alert analysis in the pipeline."""
-            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
-            if not api_key:
-                return None
+            """Build the per-alert analysis prompt used by the live pipeline."""
             prompt = f"""You are a SOC (Security Operations Center) analyst. A real-time data pipeline has detected a threat. Give a rapid triage report.
 
 LIVE ALERT — {severity} | Score: {score}/100
@@ -859,27 +831,7 @@ One sentence explaining why this is {severity} specifically (which combination o
 **IMMEDIATE SOLUTION**
 3 numbered steps the SOC team must execute in the next 15 minutes to contain this."""
 
-            try:
-                resp = requests.post(
-                    "https://api.anthropic.com/v1/messages",
-                    headers={
-                        "Content-Type": "application/json",
-                        "x-api-key": api_key,
-                        "anthropic-version": "2023-06-01"
-                    },
-                    json={
-                        "model": "claude-sonnet-4-6",
-                        "max_tokens": 500,
-                        "messages": [{"role": "user", "content": prompt}]
-                    },
-                    timeout=20
-                )
-                data = resp.json()
-                if 'content' in data:
-                    return data['content'][0]['text']
-            except Exception:
-                pass
-            return None
+            return generate_ai(prompt)
 
         events_shown = []
         total_proc = 0; total_alerts = 0; total_crit = 0
@@ -892,7 +844,10 @@ One sentence explaining why this is {severity} specifically (which combination o
             event = {k: row[k] for k in ['user_id','username','action','resource',
                                            'resource_sensitivity','status','time_classification']}
             event['timestamp'] = str(row['timestamp'])
-            score, severity, reasons, priv, dept, role, inactive = score_event_fast(event)
+            profile = raw_profiles.get(event['user_id'], {})
+            score, severity, reasons, priv, inactive = score_event(event, profile, brief_reasons=True)
+            dept = profile.get('department', '')
+            role = profile.get('job_title', '')
             total_proc += 1
             if severity in ['CRITICAL','HIGH','MEDIUM']:
                 total_alerts += 1
@@ -942,10 +897,8 @@ One sentence explaining why this is {severity} specifically (which combination o
             st.markdown('<div class="section-head">🤖 AI Triage Report — Critical Alerts Deep Analysis</div>', unsafe_allow_html=True)
             st.markdown("""
             <div style="background:#ffffff;border:1px solid #bfdbfe;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#374151">
-                Each CRITICAL alert below has been analyzed by Claude AI. Expand any alert to see the full threat assessment, why the severity was assigned, and the 3-step immediate containment plan.
+                Each CRITICAL alert below has been analyzed by AI. Expand any alert to see the full threat assessment, why the severity was assigned, and the 3-step immediate containment plan.
             </div>""", unsafe_allow_html=True)
-
-            api_key = os.environ.get("ANTHROPIC_API_KEY", "")
 
             for i, alert_data in enumerate(critical_alerts_detail[:10]):  # cap at 10 to avoid rate limits
                 ev = alert_data['event']
@@ -1005,42 +958,35 @@ One sentence explaining why this is {severity} specifically (which combination o
                         </div>""", unsafe_allow_html=True)
 
                     # AI analysis section
-                    st.markdown('<div style="font-size:12px;font-weight:600;color:#2563eb;margin:12px 0 8px;font-family:JetBrains Mono,monospace;border-left:3px solid #2563eb;padding-left:8px">🤖 CLAUDE AI TRIAGE REPORT</div>', unsafe_allow_html=True)
+                    st.markdown('<div style="font-size:12px;font-weight:600;color:#2563eb;margin:12px 0 8px;font-family:JetBrains Mono,monospace;border-left:3px solid #2563eb;padding-left:8px">🤖 AI TRIAGE REPORT</div>', unsafe_allow_html=True)
 
-                    if api_key:
-                        cache_key = f"pipe_narrative_{ev['user_id']}_{ev['timestamp']}"
-                        if cache_key not in st.session_state:
-                            with st.spinner(f"Claude analyzing {ev['username']}..."):
-                                analysis = get_pipeline_ai_analysis(ev, sc, sev, reas, priv, dp, rl, inc)
-                                st.session_state[cache_key] = analysis if analysis else "Analysis could not be generated. Check API key."
+                    cache_key = f"pipe_narrative_{ev['user_id']}_{ev['timestamp']}"
+                    if cache_key not in st.session_state:
+                        with st.spinner(f"Analyzing {ev['username']}..."):
+                            analysis = get_pipeline_ai_analysis(ev, sc, sev, reas, priv, dp, rl, inc)
+                            st.session_state[cache_key] = analysis if analysis else "Analysis could not be generated. Check API key."
 
-                        analysis_text = st.session_state.get(cache_key, "")
-                        if analysis_text:
-                            import re
-                            sections = re.split(r'(\*\*[^*]+\*\*)', analysis_text)
-                            rendered = ""
-                            for part in sections:
-                                if part.startswith("**") and part.endswith("**"):
-                                    label = part[2:-2]
-                                    rendered += f'<div style="font-size:11px;font-weight:700;color:#2563eb;font-family:JetBrains Mono,monospace;margin:12px 0 4px;text-transform:uppercase;letter-spacing:1px">⚡ {label}</div>'
-                                else:
-                                    for line in part.strip().split('\n'):
-                                        line = line.strip()
-                                        if not line:
-                                            continue
-                                        if re.match(r'^\d+\.', line):
-                                            rendered += f'<div style="font-size:13px;color:#111827;padding:5px 0 5px 14px;border-left:2px solid #3b82f6;margin:3px 0;line-height:1.5">{line}</div>'
-                                        elif line.startswith('-'):
-                                            rendered += f'<div style="font-size:13px;color:#111827;padding:2px 0 2px 14px;line-height:1.5">• {line[1:].strip()}</div>'
-                                        else:
-                                            rendered += f'<div style="font-size:13px;color:#111827;line-height:1.7;margin:3px 0">{line}</div>'
-                            st.markdown(f'<div class="llm-narrative" style="margin-top:8px">{rendered}</div>', unsafe_allow_html=True)
-                    else:
-                        st.markdown("""
-                        <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:14px;font-size:13px;color:#92400e">
-                            ⚠️ Set the <code>ANTHROPIC_API_KEY</code> environment variable to enable AI triage reports.<br>
-                            Run: <code>export ANTHROPIC_API_KEY=your_key_here</code> then restart Streamlit.
-                        </div>""", unsafe_allow_html=True)
+                    analysis_text = st.session_state.get(cache_key, "")
+                    if analysis_text:
+                        import re
+                        sections = re.split(r'(\*\*[^*]+\*\*)', analysis_text)
+                        rendered = ""
+                        for part in sections:
+                            if part.startswith("**") and part.endswith("**"):
+                                label = part[2:-2]
+                                rendered += f'<div style="font-size:11px;font-weight:700;color:#2563eb;font-family:JetBrains Mono,monospace;margin:12px 0 4px;text-transform:uppercase;letter-spacing:1px">⚡ {label}</div>'
+                            else:
+                                for line in part.strip().split('\n'):
+                                    line = line.strip()
+                                    if not line:
+                                        continue
+                                    if re.match(r'^\d+\.', line):
+                                        rendered += f'<div style="font-size:13px;color:#111827;padding:5px 0 5px 14px;border-left:2px solid #3b82f6;margin:3px 0;line-height:1.5">{line}</div>'
+                                    elif line.startswith('-'):
+                                        rendered += f'<div style="font-size:13px;color:#111827;padding:2px 0 2px 14px;line-height:1.5">• {line[1:].strip()}</div>'
+                                    else:
+                                        rendered += f'<div style="font-size:13px;color:#111827;line-height:1.7;margin:3px 0">{line}</div>'
+                        st.markdown(f'<div class="llm-narrative" style="margin-top:8px">{rendered}</div>', unsafe_allow_html=True)
 
                     # Quick action buttons per alert
                     ba1, ba2 = st.columns(2)

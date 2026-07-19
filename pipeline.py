@@ -1,6 +1,6 @@
 from simulator import simulate_kafka_stream
 from spark_processor import process_event
-import json
+
 
 def run_pipeline(csv_path, events_per_second=10, max_events=None):
     """

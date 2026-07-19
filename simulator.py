@@ -1,6 +1,6 @@
 import pandas as pd
-import json
 import time
+
 
 def simulate_kafka_stream(csv_path, events_per_second=10):
     """
