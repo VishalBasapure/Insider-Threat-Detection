@@ -1,25 +1,21 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/InsiderShield-Threat%20Detection-1F4E79?style=for-the-badge&logo=shield&logoColor=white" />
-
 # 🛡️ InsiderShield
 ### Real-Time Insider Threat Detection Platform
 
-*Kafka · Spark · Scikit-learn · Claude AI · Streamlit*
-
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Gemini AI](https://img.shields.io/badge/Gemini-AI%20Analysis-4285F4?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev)
 [![Scikit-learn](https://img.shields.io/badge/Scikit--learn-ML-F7931E?style=flat-square&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
-[![Claude AI](https://img.shields.io/badge/Claude-AI%20Narratives-8B5CF6?style=flat-square&logo=anthropic&logoColor=white)](https://anthropic.com)
 [![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)](LICENSE)
 
 <br/>
 
-> **Detects, scores, explains, and predicts insider threats in real time — across 1,200+ access events — using a 7-signal risk engine, machine learning, and AI-generated threat narratives.**
+> **Detects, scores, explains, and predicts insider threats in real time — across 1,200+ access log events — using a 7-signal risk engine, machine learning, and Gemini AI-generated threat narratives.**
 
 <br/>
 
-[Features](#-features) · [Architecture](#-architecture) · [Quick Start](#-quick-start) · [How It Works](#-how-it-works) · [Screenshots](#-dashboard-preview) · [Tech Stack](#-tech-stack)
+[Features](#-features) · [Architecture](#-architecture) · [Quick Start](#-quick-start) · [How It Works](#-how-it-works) · [Project Structure](#-project-structure) · [Tech Stack](#-tech-stack)
 
 ---
 
@@ -27,9 +23,7 @@
 
 ## 🚨 The Problem
 
-Organizations generate millions of access events every day. Most are routine. But buried inside that volume are the events that matter — a user exporting data they have no reason to touch, a dormant account suddenly performing admin operations at 3 AM, or a low-privilege employee accessing restricted systems.
-
-Traditional tools catch these too late, if at all. InsiderShield changes that.
+Most organizations only discover insider threats after the damage is done — because they have the data, but not the tooling to process it in real time with context. A login at 3 AM looks fine in a spreadsheet. In InsiderShield, it's flagged within milliseconds.
 
 ---
 
@@ -37,56 +31,57 @@ Traditional tools catch these too late, if at all. InsiderShield changes that.
 
 | Module | What It Does |
 |--------|-------------|
-| **📊 Dashboard** | Live alert feed, risk score histogram, repeat-offender rankings, access heatmap, FP tracker |
-| **🔍 Investigate** | Click-to-drill user dossier, anomaly signal breakdown, 30-day activity timeline |
-| **🤖 AI Narrative** | Claude API generates a 3-sentence threat summary per alert — what happened, why it's suspicious, what to do |
-| **🔮 Predictions** | 7-day risk trajectory (Logistic Regression), behavioral clustering (K-Means), recommendation engine |
-| **⚡ Live Pipeline** | Real-time Kafka→Spark simulation with event feed, live metrics, and post-run severity report |
-| **📄 PDF Export** | One-click downloadable threat report per alert |
-| **✅ FP Management** | Mark false positives, escalate to CRITICAL, track resolution rate |
+| **📊 Dashboard** | Live alert feed, risk histogram, repeat-offender bar chart, access heatmap, FP tracker, threshold sensitivity chart |
+| **🔍 Investigate** | Click any alert → user dossier card, signal breakdown with progress bars, 30-day activity timeline |
+| **🤖 AI Narrative** | Gemini generates a plain-English threat summary per alert — what triggered it, why it's suspicious, what to do |
+| **🔮 Predictions** | 7-day risk trajectory (Logistic Regression) + behavioral clustering (K-Means) + recommendation engine |
+| **⚡ Live Pipeline** | Real-time Kafka→Spark simulation — watch events stream in, see metrics update live, get a full AI triage report after |
+| **📄 PDF Export** | One-click downloadable report per alert from the Investigate tab |
+| **✅ FP Management** | Mark false positives, escalate to CRITICAL, track the resolution count on the dashboard |
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    INSIDERSHIELD PIPELINE                       │
-│                                                                 │
-│  CSV / Kafka Topic                                              │
-│       │                                                         │
-│       ▼                                                         │
-│  ┌─────────────┐     ┌──────────────────┐    ┌──────────────┐  │
-│  │  simulator  │────▶│  spark_processor │───▶│ alerts_output│  │
-│  │  (Kafka sim)│     │  (Risk Engine)   │    │    .csv      │  │
-│  └─────────────┘     └──────────────────┘    └──────┬───────┘  │
-│                             │                        │          │
-│                    user_profiles.csv                 │          │
-│                    (Redis in prod)                   ▼          │
-│                                              ┌──────────────┐  │
-│                                              │  Streamlit   │  │
-│                                              │  Dashboard   │  │
-│                                              └──────┬───────┘  │
-│                                                     │          │
-│                                              ┌──────▼───────┐  │
-│                                              │  Claude API  │  │
-│                                              │ (Narratives) │  │
-│                                              └──────────────┘  │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                   INSIDERSHIELD PIPELINE                     │
+│                                                              │
+│   data_access_logs.csv  ←→  (Kafka topic in production)     │
+│              │                                               │
+│              ▼                                               │
+│       simulator.py          ← Kafka producer sim            │
+│       (streams JSON events one-by-one)                       │
+│              │                                               │
+│              ▼                                               │
+│      spark_processor.py     ← Spark Streaming sim           │
+│      (score_event per event + user profile lookup)           │
+│              │                                               │
+│    user_profiles.csv        ← Redis cache in production      │
+│              │                                               │
+│              ▼                                               │
+│       alerts_output.csv     ← PostgreSQL in production       │
+│              │                                               │
+│              ▼                                               │
+│         app.py              ← Streamlit Dashboard            │
+│              │                                               │
+│              ▼                                               │
+│       Gemini API            ← AI threat narratives           │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ### Hackathon vs Production
 
-| Layer | This Repo | Production Equivalent |
-|-------|-----------|----------------------|
-| Event Ingestion | `simulator.py` reads CSV | Apache Kafka (12 partitions, 100k msg/sec) |
-| Stream Processing | Python loop in `spark_processor.py` | Apache Spark Streaming (20 worker nodes) |
-| User Profile Lookup | In-memory dictionary | Redis Cache (sub-millisecond) |
-| Storage | `alerts_output.csv` | PostgreSQL + S3 Parquet |
-| Full-text Search | — | Elasticsearch |
+| Layer | This Repo | Production |
+|-------|-----------|------------|
+| Event ingestion | `simulator.py` reads CSV row-by-row | Apache Kafka — 12 partitions, 100k msg/sec |
+| Stream processing | Python loop in `spark_processor.py` | Apache Spark Streaming — 20 worker nodes |
+| User profile lookup | In-memory Python dict | Redis — sub-millisecond |
+| Alert storage | `alerts_output.csv` | PostgreSQL + S3 Parquet |
 | Dashboard | Streamlit | React + FastAPI |
+| AI analysis | Google Gemini API | Google Gemini API |
 
-**Production headroom: 10,000 events/sec on 20 Spark nodes — 200× above the 50 events/sec peak load at 1M events/day.**
+**Headroom: 10,000 events/sec on Spark — 200× above the 50 events/sec peak at 1M events/day.**
 
 ---
 
@@ -100,29 +95,26 @@ cd Insider-Threat-Detection
 pip install -r requirements.txt
 ```
 
-### 2. Set Your Anthropic API Key
+### 2. Add Your Gemini API Key
 
-The AI narrative feature uses Claude. Get a free key at [console.anthropic.com](https://console.anthropic.com).
+Get a free key at [aistudio.google.com](https://aistudio.google.com/app/apikey).
 
-```bash
-# Option A: environment variable (recommended)
-export ANTHROPIC_API_KEY=sk-ant-...
+Create `.streamlit/secrets.toml`:
 
-# Option B: Streamlit secrets
-mkdir -p .streamlit
-echo '[secrets]\nANTHROPIC_API_KEY = "sk-ant-..."' > .streamlit/secrets.toml
+```toml
+GEMINI_API_KEY = "your-key-here"
 ```
 
-> **Note:** The app works fully without an API key — only the AI Narrative button in the Investigate tab requires it.
+> **Without a key:** the app runs fully — only the AI narrative button and post-pipeline triage report won't generate text.
 
 ### 3. Generate Alert Data
 
 ```bash
 python pipeline.py
-# Outputs: alerts_output.csv (1,200 scored events)
+# Creates alerts_output.csv — 1,200 pre-scored events
 ```
 
-### 4. Run the Dashboard
+### 4. Launch the Dashboard
 
 ```bash
 streamlit run app.py
@@ -134,26 +126,24 @@ Open [http://localhost:8501](http://localhost:8501)
 
 ## 🧠 How It Works
 
-### 7-Signal Risk Engine
+### 7-Signal Risk Engine (`spark_processor.py`)
 
-Every event is scored 0–100 using seven independent signals:
+Every access event gets scored 0–100 using seven independent signals:
 
 ```python
-score = 0
-
 # Signal 1 — Off-hours access
 if time_classification in ['night', 'unusual_hours']:
     score += 20
 
-# Signal 2 — Resource sensitivity  
+# Signal 2 — Resource sensitivity
 sensitivity_score = {'low': 0, 'medium': 10, 'high': 25, 'restricted': 35}
 score += sensitivity_score[resource_sensitivity]
 
 # Signal 3 — Action risk level
-action_score = {'export_data': 25, 'admin_operation': 20, 'api_call': 8, ...}
-score += action_score[action]
+action_score = {'export_data': 25, 'admin_operation': 20, 'api_call': 8, 'sql_query': 5}
+score += action_score.get(action, 5)
 
-# Signal 4 — Unapproved resource access
+# Signal 4 — Unapproved resource
 if resource not in user_approved_systems:
     score += 20
 
@@ -165,7 +155,7 @@ if privilege == 'user' and action == 'admin_operation':
 if status == 'failure':
     score += 15
 
-# Signal 7 — Stale account activity  
+# Signal 7 — Stale account (inactive > 30 days)
 if days_inactive > 30:
     score += 20
 
@@ -176,31 +166,37 @@ if privilege == 'admin' and resource in approved_systems:
 score = min(score, 100)
 ```
 
-| Score Range | Severity | Action |
-|------------|----------|--------|
-| 85 – 100 | 🔴 CRITICAL | Immediate suspension + SOC escalation |
-| 65 – 84 | 🟠 HIGH | Investigate within 1 hour |
-| 40 – 64 | 🟡 MEDIUM | Review within 24 hours |
-| 0 – 39 | 🟢 LOW | Routine monthly review |
+| Score | Severity | Response |
+|-------|----------|----------|
+| 85–100 | 🔴 CRITICAL | Immediate account suspension + SOC escalation |
+| 65–84 | 🟠 HIGH | Investigate within 1 hour |
+| 40–64 | 🟡 MEDIUM | Review within 24 hours |
+| 0–39 | 🟢 LOW | Routine monthly review |
+
+---
 
 ### ML Layer
 
-**Logistic Regression** (predictive risk trajectory)
-- Features: action type, resource, time classification, privilege, sensitivity, days inactive
-- Label-encoded with `LabelEncoder`, scaled with `StandardScaler`
-- Predicts 7-day forward risk per user
+**Logistic Regression — 7-day risk trajectory**
+- Features per event: action type, resource, time classification, privilege level, sensitivity, days inactive
+- Preprocessing: `LabelEncoder` for categoricals, `StandardScaler` for normalization
+- Target: binary — whether the event scores ≥ 65 (HIGH or above)
+- Output: projected risk curve per user for the next 7 days
 
-**K-Means Clustering** (behavioral profiling)
-- Groups users by: avg score, night access ratio, sensitivity avg, admin ratio, export ratio, failure ratio
-- 3 clusters: Standard Access · High-Risk Behavior · Off-Hours/Elevated
+**K-Means Clustering — behavioral profiling**
+- Aggregates per user: avg score, night access ratio, sensitivity avg, admin ratio, export ratio, failure ratio
+- 3 clusters: `Standard Access` · `High-Risk Behavior` · `Off-Hours / Elevated`
+- Shown as a scatter plot in the Predictions tab
 
-### AI Narrative (Claude API)
+---
 
-For each alert, the investigation panel calls `claude-sonnet-4-6` with a prompt built from the user's profile, event context, and triggered signals. The response is always three sentences:
+### AI Triage (Gemini API)
 
-1. What specifically triggered this alert
-2. Why this pattern is suspicious given the user's profile
-3. Recommended action for the security team
+Two places in the app call Gemini:
+
+1. **Investigate tab** — On-demand per alert. Click "Generate AI Analysis" to get a structured breakdown: what triggered it, why it's suspicious given the user's profile, and a recommended action.
+
+2. **Live Pipeline — Post-run triage report** — After the pipeline finishes, every CRITICAL alert is automatically sent to Gemini for analysis. Each one expands into a full dossier: signal breakdown bars, AI assessment sections, and two quick-action cards (Disable in AD · Pull 72-hour logs).
 
 ---
 
@@ -208,15 +204,20 @@ For each alert, the investigation panel calls `claude-sonnet-4-6` with a prompt 
 
 ```
 Insider-Threat-Detection/
-├── app.py                  # Streamlit dashboard (4 tabs)
-├── pipeline.py             # Wires simulator → processor → output
-├── simulator.py            # Kafka replacement — streams CSV as JSON events
-├── spark_processor.py      # Spark replacement — scores each event
-├── data_access_logs.csv    # 1,200 raw access events
-├── user_profiles.csv       # 100 user profiles with role/privilege/systems
-├── alerts_output.csv       # Pre-scored events (generated by pipeline.py)
-├── SCALING.md              # Production architecture breakdown
-└── requirements.txt
+│
+├── app.py                   # Main Streamlit dashboard — 4 tabs, all UI
+├── pipeline.py              # Wires simulator → spark_processor → CSV output
+├── simulator.py             # Kafka simulator — streams CSV as JSON events
+├── spark_processor.py       # Spark simulator — score_event() function
+│
+├── data_access_logs.csv     # 1,200 raw access log events
+├── user_profiles.csv        # 100 user profiles (role, privilege, systems, inactive days)
+├── alerts_output.csv        # Pre-scored output — generated by pipeline.py
+│
+├── SCALING.md               # Production architecture breakdown
+├── requirements.txt
+└── .streamlit/
+    └── secrets.toml         # Your GEMINI_API_KEY goes here (not committed)
 ```
 
 ---
@@ -229,58 +230,49 @@ pandas
 plotly
 scikit-learn
 fpdf2
-requests
 numpy
+google-genai
 ```
 
-Install all with:
 ```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-## 🖥️ Dashboard Preview
+## 🖥️ What Each Tab Does
 
-### 📊 Main Dashboard
-- **KPI Row:** Total Events · Critical Alerts · Users Flagged · False Positives
-- **Alert Feed:** Top 10 CRITICAL/HIGH events, color-coded by severity
-- **Risk Histogram:** Distribution across all 1,200 events by score band
-- **Repeat Offenders:** Horizontal bar chart of cumulative risk by user
-- **Access Heatmap:** Alert clusters by hour of day × day of week
-- **Threshold Chart:** How alert count shifts as scoring cutoff changes
+### 📊 Dashboard
+The first thing you see. Answers: *How bad is it right now?*
+- 4 KPI cards: Total Events · Critical Alerts · Users Flagged · False Positives  
+- Color-coded alert feed (top 10 CRITICAL/HIGH, sorted by score)
+- Risk score histogram across all 1,200 events
+- Top 10 repeat offenders by cumulative risk
+- Hour × Day-of-week access heatmap (shows when attacks cluster)
+- Severity donut + false positive tracker
+- Threshold sensitivity chart (how alert count changes at each cutoff)
 
-### 🔍 Investigate Tab
-- Select any alert → user dossier card opens instantly
-- Anomaly signal breakdown with weighted progress bars
-- 30-day scatter timeline: normal activity vs risk spikes
-- AI narrative generation on demand
-- Actions: Mark FP · Escalate · Export PDF
+### 🔍 Investigate
+Click any alert row → full investigation panel opens. Answers: *Why was this flagged?*
+- User dossier: name, role, department, privilege, hire date, inactive days
+- Anomaly signal breakdown with weighted progress bars showing each signal's contribution
+- 30-day scatter timeline: normal events (green) vs risk spikes (red)
+- "Generate AI Analysis" button → Gemini writes a 3-section threat assessment
+- Actions: Mark as False Positive · Escalate to CRITICAL · Export PDF report
 
-### 🔮 Predictions Tab
-- 7-day risk trajectory per top-12 users (line chart with threshold markers)
-- Behavioral cluster scatter (avg score vs night-access ratio)
-- Rule optimization recommendations based on FP patterns
+### 🔮 Predictions
+Forward-looking view. Answers: *Who is trending toward a breach?*
+- 7-day risk trajectory chart for top-12 high-risk users (with CRITICAL/HIGH threshold lines)
+- K-Means cluster scatter: avg score vs night-access ratio, colored by cluster
+- Cluster summary table (3 profiles: Standard / High-Risk / Off-Hours)
+- AI recommendation cards: rule weight adjustments, MFA policy, stale account cleanup
 
-### ⚡ Live Pipeline Tab
-- Configurable speed (1–50 events/sec) and event count
-- Live scrolling terminal feed of CRITICAL/HIGH events
-- Real-time metrics: Processed · Alerts · Critical · Rate
-- Post-simulation report: severity breakdown, top offenders, remediation playbook
-
----
-
-## 🔬 Tech Stack
-
-| Category | Tools |
-|----------|-------|
-| **Language** | Python 3.10+ |
-| **Dashboard** | Streamlit, Plotly |
-| **ML / Data** | Scikit-learn, Pandas, NumPy |
-| **AI** | Anthropic Claude API (`claude-sonnet-4-6`) |
-| **PDF Export** | fpdf2 |
-| **Architecture (simulated)** | Apache Kafka, Apache Spark Streaming |
-| **Architecture (production)** | Redis, PostgreSQL, S3, Elasticsearch |
+### ⚡ Live Pipeline
+The "wow" tab. Shows the system actually working. Answers: *Can I see it process events live?*
+- Speed slider (1–50 events/sec) and event count slider
+- Live scrolling terminal feed — CRITICAL events in red, HIGH in orange
+- Four real-time metrics updating every event: Processed · Alerts · Critical · Rate
+- After completion: full AI Triage Report for every CRITICAL alert, each in an expander with signal bars, Gemini analysis, and quick-action cards
 
 ---
 
@@ -288,24 +280,22 @@ pip install -r requirements.txt
 
 | Metric | Value |
 |--------|-------|
-| Events processed | 1,200 per demo run |
-| Pipeline throughput (demo) | Up to 50 events/sec |
+| Events in demo | 1,200 |
+| Max pipeline speed | 50 events/sec |
 | Scoring latency | < 1ms per event |
-| Production target | 1M+ events/day · 10,000 events/sec |
-| ML training time | < 2 seconds on 1,200 events |
-| Dashboard load time | < 3 seconds |
+| ML training time | < 2 seconds |
+| Production target | 1M+ events/day · 10,000 events/sec on Spark |
 
 ---
 
 ## 🗺️ Roadmap
 
 - [ ] Replace CSV simulator with live Kafka consumer
-- [ ] Deploy Spark job to AWS EMR / Databricks
-- [ ] Add LSTM-based anomaly detection for sequence-aware scoring
-- [ ] Network traffic signals (volume, lateral movement)
-- [ ] Slack / PagerDuty webhook integration for CRITICAL alerts
-- [ ] Role-based access for analyst vs manager dashboard views
-- [ ] Auto-learn signal weights from labeled incident feedback
+- [ ] Spark job deployment on AWS EMR / Databricks
+- [ ] LSTM sequence model for detecting multi-step attack chains
+- [ ] Slack / PagerDuty webhook on CRITICAL alerts
+- [ ] Network volume signals (data exfiltration detection)
+- [ ] Role-based access: analyst view vs SOC manager view
 
 ---
 
@@ -313,7 +303,7 @@ pip install -r requirements.txt
 
 **Vishal Basapure**  
 MCA · PES University, Bengaluru  
-AI/ML · Full Stack · Data Science
+AI/ML · Full Stack · Cybersecurity
 
 [![GitHub](https://img.shields.io/badge/GitHub-VishalBasapure-181717?style=flat-square&logo=github)](https://github.com/VishalBasapure)
 
@@ -321,14 +311,14 @@ AI/ML · Full Stack · Data Science
 
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE).
 
 ---
 
 <div align="center">
 
-Built for the **CIDECODE Hackathon 2026** · CID Karnataka / CCITR / PES University
+Built for **CIDECODE Hackathon 2026** · CID Karnataka / CCITR / PES University
 
-*If this helped you, drop a ⭐ — it means a lot.*
+*If this project helped you, drop a ⭐*
 
 </div>
