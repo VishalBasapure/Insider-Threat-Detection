@@ -317,7 +317,7 @@ MIT — see [LICENSE](LICENSE).
 
 <div align="center">
 
-Built for **CIDECODE Hackathon 2026** · CID Karnataka / CCITR / PES University
+Built for **Societal General Hackathon 2026** ·PES University
 
 *If this project helped you, drop a ⭐*
 
